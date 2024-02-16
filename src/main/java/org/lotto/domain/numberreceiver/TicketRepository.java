@@ -3,7 +3,7 @@ package org.lotto.domain.numberreceiver;
 import java.time.LocalDateTime;
 import java.util.List;
 
-interface NumberReceiverRepository {
+interface TicketRepository {
     Ticket save(Ticket ticket);
 
     List<Ticket> findAll(LocalDateTime date);

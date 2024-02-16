@@ -6,5 +6,10 @@ import java.time.LocalDateTime;
 
 import java.util.Set;
 @Builder
-public record TicketDto(LocalDateTime date, String ticketId,Set<Integer> userNumbers) {
+public record TicketDto(
+        LocalDateTime ticketOrderDate,
+        LocalDateTime drawDate,
+        String ticketId,
+        Set<Integer> userNumbers
+) {
 }

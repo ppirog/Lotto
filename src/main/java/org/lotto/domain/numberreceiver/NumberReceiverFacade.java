@@ -13,15 +13,17 @@ import java.util.UUID;
 /**
  * klinet podaje 6 liczb z zakresu 1-99
  * liczby nie mogą się powtarzać
- * klient dostaje informajce o dacie losowania
+ * klient dostaje informajce o dacie losowania (losowania są co soboty o 12:00)
  * klient dostaje informacje o swoim unikalnym ID losownaia
+ *
  */
 @AllArgsConstructor
 public class NumberReceiverFacade {
 
     private final NumberValidator numberValidator;
-    private final NumberReceiverRepository repository;
+    private final TicketRepository repository;
     private final Clock clock;
+    private final IdGenerable idGenerator;
 
     public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
 
@@ -33,7 +35,7 @@ public class NumberReceiverFacade {
                     .build();
         }
 
-        final String id = UUID.randomUUID().toString();
+        final String id = idGenerator.generateId();
         LocalDateTime now = LocalDateTime.now(clock);
 
         Ticket ticket = Ticket.builder()
@@ -45,8 +47,7 @@ public class NumberReceiverFacade {
         repository.save(ticket);
 
         return InputNumberResultDto.builder()
-                .ticketId(ticket.id())
-                .date(ticket.date())
+                .ticketDto(TicketMapper.mapFromTicketToTicketDto(ticket))
                 .message("success")
                 .build();
     }
@@ -58,5 +59,9 @@ public class NumberReceiverFacade {
         return tickets.stream()
                 .map(TicketMapper::mapFromTicketToTicketDto)
                 .toList();
+    }
+
+    public LocalDateTime nextDrawDate(LocalDateTime date) {
+        return DrawDateGenerator.generateDrawDate(date);
     }
 }
