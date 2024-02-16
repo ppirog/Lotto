@@ -4,15 +4,22 @@ import org.junit.jupiter.api.Test;
 import org.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import org.lotto.domain.numberreceiver.dto.TicketDto;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NumberReceiverFacadeTest {
+
+    AdjustableClock clock = new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault());
     private NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
             new NumberValidator(),
-            new InMemoryNumberReceiverRepositoryTestImpl()
+            new InMemoryNumberReceiverRepositoryTestImpl(),
+            clock
     );
 
     @Test
@@ -61,9 +68,15 @@ class NumberReceiverFacadeTest {
     public void should_return_save_to_database_when_user_give_six_numbers_test_1(){
 
         final Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
+        clock.advanceInTimeBy(Duration.ofDays(0));
 
         final InputNumberResultDto inputted = numberReceiverFacade.inputNumbers(numbersFromUser);
-        List<TicketDto> userNumbers = numberReceiverFacade.userNumbers(inputted.date());
+
+        final LocalDateTime localDateTime = LocalDateTime.of(2024, 2, 14, 0, 0);
+
+
+        List<TicketDto> userNumbers = numberReceiverFacade.userNumbers(localDateTime);
+
 
         assertThat(userNumbers).contains(TicketDto.builder()
                 .date(inputted.date())
@@ -73,29 +86,20 @@ class NumberReceiverFacadeTest {
     }
 
     @Test
-    public void should_return_save_to_database_when_user_give_six_numbers_test_2(){
+    public void should_not_return_save_to_database_when_user_give_six_numbers_test_1(){
 
-        final Set<Integer> numbersFromUser = Set.of(11, 2, 3, 4, 5, 6);
+        clock.advanceInTimeBy(Duration.ofDays(10));
 
-        final InputNumberResultDto inputted = numberReceiverFacade.inputNumbers(numbersFromUser);
-        List<TicketDto> userNumbers = numberReceiverFacade.userNumbers(inputted.date());
-
-        assertThat(userNumbers).contains(TicketDto.builder()
-                .date(inputted.date())
-                .ticketId(inputted.ticketId())
-                .userNumbers(numbersFromUser)
-                .build());
-    }
-
-    @Test
-    public void should_return_save_to_database_when_user_give_six_numbers_test_3(){
-
-        final Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 99);
+        final Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
 
         final InputNumberResultDto inputted = numberReceiverFacade.inputNumbers(numbersFromUser);
-        List<TicketDto> userNumbers = numberReceiverFacade.userNumbers(inputted.date());
 
-        assertThat(userNumbers).contains(TicketDto.builder()
+        final LocalDateTime localDateTime = LocalDateTime.of(2024, 2, 14, 10, 0);
+
+
+        List<TicketDto> userNumbers = numberReceiverFacade.userNumbers(localDateTime);
+
+        assertThat(userNumbers).doesNotContain(TicketDto.builder()
                 .date(inputted.date())
                 .ticketId(inputted.ticketId())
                 .userNumbers(numbersFromUser)

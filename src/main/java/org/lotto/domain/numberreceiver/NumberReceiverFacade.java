@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import org.lotto.domain.numberreceiver.dto.TicketDto;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,7 @@ public class NumberReceiverFacade {
 
     private final NumberValidator numberValidator;
     private final NumberReceiverRepository repository;
+    private final Clock clock;
 
     public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
 
@@ -32,7 +34,7 @@ public class NumberReceiverFacade {
         }
 
         final String id = UUID.randomUUID().toString();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(clock);
 
         Ticket ticket = Ticket.builder()
                 .id(id)
@@ -50,17 +52,11 @@ public class NumberReceiverFacade {
     }
 
 
-    public List<TicketDto> userNumbers(LocalDateTime date){
+    public List<TicketDto> userNumbers(LocalDateTime date) {
 
         final List<Ticket> tickets = repository.findAll(date);
-
         return tickets.stream()
-                .map(
-                        ticket -> TicketDto.builder()
-                                .date(ticket.date())
-                                .ticketId(ticket.id())
-                                .userNumbers(ticket.numbers())
-                                .build()
-                ).toList();
+                .map(TicketMapper::mapFromTicketToTicketDto)
+                .toList();
     }
 }
