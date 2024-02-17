@@ -60,7 +60,7 @@ public class NumberReceiverFacade {
                 .toList();
     }
 
-    public LocalDateTime retrieveNextDrawDate(LocalDateTime date) {
-        return DrawDateGenerator.generateDrawDate(date);
+    public LocalDateTime retrieveNextDrawDate() {
+        return DrawDateGenerator.generateDrawDate(LocalDateTime.now(clock));
     }
 }
