@@ -8,7 +8,6 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * klinet podaje 6 liczb z zakresu 1-99
@@ -61,7 +60,7 @@ public class NumberReceiverFacade {
                 .toList();
     }
 
-    public LocalDateTime nextDrawDate(LocalDateTime date) {
+    public LocalDateTime retrieveNextDrawDate(LocalDateTime date) {
         return DrawDateGenerator.generateDrawDate(date);
     }
 }
