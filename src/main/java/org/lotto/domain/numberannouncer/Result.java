@@ -1,16 +1,16 @@
-package org.lotto.domain.resultchecker.dto;
+package org.lotto.domain.numberannouncer;
 
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+
 @Builder
-public record PlayerDto(
+record Result(
         String ticketId,
-        Set<Integer> numbers,
-        Set<Integer> winNumbers,
         boolean isWinner,
         Integer howManyNumbersWin,
+        Set<Integer> winNumbers,
         LocalDateTime drawDate
 ) {
 }
