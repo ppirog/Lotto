@@ -8,6 +8,7 @@ public record PlayerDto(
         String ticketId,
         Set<Integer> numbers,
         Set<Integer> winNumbers,
+        boolean isWinner,
         Integer howManyNumbersWin
 ) {
 }
