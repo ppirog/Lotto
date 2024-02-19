@@ -3,7 +3,6 @@ package org.lotto.domain.resultchecker;
 import org.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.lotto.domain.numberreceiver.dto.TicketDto;
 import org.lotto.domain.resultchecker.dto.PlayerDto;
-import java.util.Set;
 class PlayerMapper {
 
 
@@ -14,6 +13,7 @@ class PlayerMapper {
                 .winNumbers(ticketValidator.winningUserNumbers(ticketDto.userNumbers(), winningNumbersDto.numbers()))
                 .howManyNumbersWin(ticketValidator.howManyNumbersWin(ticketDto.userNumbers(), winningNumbersDto.numbers()))
                 .isWinner(ticketValidator.isWinner(ticketDto.userNumbers(), winningNumbersDto.numbers()))
+                .drawDate(ticketDto.drawDate())
                 .build();
 
     }
