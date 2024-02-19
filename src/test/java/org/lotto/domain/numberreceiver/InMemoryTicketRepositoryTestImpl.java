@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 class InMemoryTicketRepositoryTestImpl implements TicketRepository {
@@ -22,5 +23,10 @@ class InMemoryTicketRepositoryTestImpl implements TicketRepository {
                 .stream()
                 .filter(ticket -> ticket.date().toLocalDate().equals(date.toLocalDate()))
                 .toList();
+    }
+
+    @Override
+    public Optional<Ticket> findById(final String ticketId) {
+        return Optional.ofNullable(inMemoryDatabase.get(ticketId));
     }
 }
