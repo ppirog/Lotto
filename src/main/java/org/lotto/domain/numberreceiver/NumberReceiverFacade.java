@@ -14,7 +14,7 @@ import java.util.Set;
  * liczby nie mogą się powtarzać
  * klient dostaje informajce o dacie losowania (losowania są co soboty o 12:00)
  * klient dostaje informacje o swoim unikalnym ID losownaia
- *
+ * klient moze sprawdzic czy wygrał (informacja ile trafił liczb)
  */
 @AllArgsConstructor
 public class NumberReceiverFacade {
@@ -59,6 +59,16 @@ public class NumberReceiverFacade {
                 .map(TicketMapper::mapFromTicketToTicketDto)
                 .toList();
     }
+
+    public TicketDto usersNumberByTicketId(String ticketId) {
+
+        final Ticket ticket = repository.findById(ticketId)
+                .orElseThrow(() -> new NotFoundInDatabaseException("No ticket found for id: " + ticketId));
+
+        return TicketMapper.mapFromTicketToTicketDto(ticket);
+    }
+
+
 
     public LocalDateTime retrieveNextDrawDate() {
         return DrawDateGenerator.generateDrawDate(LocalDateTime.now(clock));
