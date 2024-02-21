@@ -18,7 +18,7 @@ class NumberGeneratorFacadeTest {
 
     NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
-    NumberGeneratorFacade numberGeneratorFacadeWithRandomNumbers = new NumberGeneratorFacade(new WinningNumbersGenerator(), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
+    NumberGeneratorFacade numberGeneratorFacadeWithRandomNumbers = new NumberGeneratorFacade(new WinningNumbersGenerator(new OneRandomNumberFetcher()), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
     NumberGeneratorFacade numberGeneratorFacadeWithStaticNumbers = new NumberGeneratorFacade(new WinningNumbersGeneratorTestImplWithCorrectSetOfNumbers(), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
 
     NumberGeneratorFacade numberGeneratorFacadeWithStaticIncorrectRangeOfNumbers = new NumberGeneratorFacade(new WinningNumbersGeneratorTestImplWithIncorrectRangeOfNumbersInSetOfNumbers(), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
@@ -43,6 +43,7 @@ class NumberGeneratorFacadeTest {
         // Then
         assertTrue(winningNumbers.numbers().stream().allMatch(number -> number >= 1 && number <= 99));
     }
+
 
     @Test
     void should_return_winning_numbers_with_no_duplicates() {

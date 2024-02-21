@@ -67,7 +67,7 @@ class NumberReceiverFacadeTest {
                 new IdGeneratorTestImpl()
         );
 
-        final InputNumberResultDto inputted = numberReceiverFacade.inputNumbers(Set.of(111, 2, 3, 4, 5, 6));
+        final InputNumberResultDto inputted = numberReceiverFacade.inputNumbers(Set.of(100, 2, 3, 4, 5, 6));
         assertThat(inputted.message()).isEqualTo("failure");
     }
 
