@@ -20,7 +20,7 @@ public class NumberGeneratorFacade {
         final LocalDateTime nextDrawDate = numberReceiverFacade.retrieveNextDrawDate();
 
         if (!winningNumbersRepository.existsByDate(nextDrawDate)) {
-            final Set<Integer> numbers = winningNumbersGenerator.generateSixWinningNumbers();
+            final Set<Integer> numbers = winningNumbersGenerator.generateSixWinningNumbers().numbers();
             winningNumbersValidator.validate(numbers);
             winningNumbersRepository.save(WinningNumbers.builder()
                     .numbers(numbers)

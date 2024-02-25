@@ -1,8 +1,8 @@
 package org.lotto.domain.numbergenerator;
 
-import java.util.Set;
+import org.lotto.domain.numbergenerator.dto.SixRandomNumbersDto;
 
 interface WinningNumbersGenerable {
 
-    Set<Integer> generateSixWinningNumbers();
+    SixRandomNumbersDto generateSixWinningNumbers();
 }
