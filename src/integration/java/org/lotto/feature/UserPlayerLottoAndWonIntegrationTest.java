@@ -4,17 +4,20 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.Test;
 import org.lotto.BaseIntegrationTest;
 import org.lotto.domain.numbergenerator.NumberGeneratorFacade;
-import org.lotto.domain.numbergenerator.WinningNumbersGenerable;
-import org.lotto.domain.numbergenerator.dto.SixRandomNumbersDto;
-import org.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+import static org.awaitility.Awaitility.await;
 
 
 public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    NumberGeneratorFacade numberGeneratorFacade;
+    private NumberGeneratorFacade numberGeneratorFacade;
+
 
     @Test
     public void should_user_win_and_system_should_generate_winners() {
@@ -26,7 +29,7 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
          * step 5: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
          * step 6: 3 hours passed, and it is 1 minute after announcement time (19.11.2022 15:01)
          * step 7: user made GET /results/sampleTicketId and system returned 200 (OK)
-        * */
+         * */
 
         //step 1
         //given
@@ -37,11 +40,26 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                         .withBody("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]")
                 )
         );
-//        final SixRandomNumbersDto sixRandomNumbersDto = winningNumbersGenerable.generateSixWinningNumbers(1, 99, 25);
-        final WinningNumbersDto winningNumbersDto = numberGeneratorFacade.generateWinningNumbers();
+//        final WinningNumbersDto winningNumbersDto = numberGeneratorFacade.generateWinningNumbers();
 
+        //step 2
+        //given
+        LocalDateTime drawDate = LocalDateTime.of(2022, 11, 19, 12, 0);
 
         //when
+        await()
+                .pollInterval(Duration.ofSeconds(1))
+                .until(() -> {
+                            try {
+                                numberGeneratorFacade.retrieveWinningNumbers(drawDate);
+                                return true;
+                            } catch (Exception e) {
+                                return false;
+                            }
+                        }
+                );
+
+
         //then
 
     }

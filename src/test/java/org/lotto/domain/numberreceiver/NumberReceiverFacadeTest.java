@@ -19,8 +19,14 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_success_when_input_numbers_size_is_six() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+//        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
+//                new NumberValidator(),
+//                new InMemoryTicketRepositoryTestImpl(),
+//                new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
+//                new IdGeneratorTestImpl()
+//        );
+
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -32,8 +38,8 @@ class NumberReceiverFacadeTest {
 
     @Test
     public void should_return_failure_when_input_numbers_size_is_five() {
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -46,8 +52,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_failure_when_input_numbers_size_is_seven() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -60,8 +66,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_failure_when_input_numbers_are_not_in_range_1_99_test_1() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -74,8 +80,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_failure_when_input_numbers_are_not_in_range_1_99_test_2() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -88,8 +94,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_failure_when_input_numbers_are_not_in_range_1_99_test_3() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -102,8 +108,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_success_when_input_numbers_are_in_range_1_99() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -116,8 +122,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_save_to_database_when_user_give_six_numbers_test_1() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -142,8 +148,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_not_return_save_to_database_when_user_give_six_numbers_test_1() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 24, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -167,8 +173,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_draw_date_to_user_when_date_is_exacly_the_same_as_draw_date() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 17, 12, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -187,8 +193,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_draw_date_to_user_when_day_of_week_is_before_saturday() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 15, 12, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -207,8 +213,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_draw_date_to_user_when_day_of_week_is_the_same_as_day_of_draw_date_and_is_before_noon() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 17, 10, 59,59).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),// here is 10 h not 12 because it is greenich time not polish
                 new IdGeneratorTestImpl()
@@ -230,8 +236,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_draw_date_to_user_when_day_of_week_is_the_same_as_day_of_draw_date_and_is_after_noon() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 17, 11, 00,01).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()), // here is 11 h not 12 because it is greenich time not polish
                 new IdGeneratorTestImpl()
@@ -253,8 +259,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_draw_date_to_user_when_day_of_week_is_after_saturday() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 18, 12, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -275,8 +281,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_id_to_user() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -294,8 +300,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_size_of_random_id_to_user() {
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGenerator()
@@ -311,8 +317,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_correct_numbers_from_database_by_id(){
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()
@@ -330,8 +336,8 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_throw_exception_when_not_found_numbers_by_ticket_id_from_database(){
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverFacade(
-                new NumberValidator(),
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().createForTest(
+
                 new InMemoryTicketRepositoryTestImpl(),
                 new AdjustableClock(LocalDateTime.of(2024, 2, 14, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault()),
                 new IdGeneratorTestImpl()

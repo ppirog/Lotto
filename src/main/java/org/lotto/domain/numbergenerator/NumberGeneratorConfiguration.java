@@ -28,15 +28,7 @@ class NumberGeneratorConfiguration {
             }
         };
     }
-    @Bean
-    NumberReceiverFacade numberReceiverFacade() {
-        return new NumberReceiverFacade(null,null,null,null) {
-            @Override
-            public LocalDateTime retrieveNextDrawDate() {
-                return null;
-            }
-        };
-    }
+
 
     @Bean
     public NumberGeneratorFacade numberGeneratorFacade(WinningNumbersGenerable winningNumbersGenerable, WinningNumbersRepository winningNumbersRepository, NumberReceiverFacade numberReceiverFacade, WinningNumberGeneratorFacadeConfigurationProperties properties) {
