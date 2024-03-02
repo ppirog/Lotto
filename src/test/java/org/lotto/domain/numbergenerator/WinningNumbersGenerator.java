@@ -14,7 +14,7 @@ class WinningNumbersGenerator implements WinningNumbersGenerable {
     private static final Integer LOWER_BOUND = 1;
 
     @Override
-    public SixRandomNumbersDto generateSixWinningNumbers() {
+    public SixRandomNumbersDto generateSixWinningNumbers(final int lowerBand, final int upperBand, final int count) {
         Set<Integer> winIntegers = new HashSet<>();
 
         while (winIntegers.size() < 6) {

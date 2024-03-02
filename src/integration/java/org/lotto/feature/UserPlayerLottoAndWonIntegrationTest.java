@@ -3,8 +3,10 @@ package org.lotto.feature;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import org.junit.jupiter.api.Test;
 import org.lotto.BaseIntegrationTest;
+import org.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import org.lotto.domain.numbergenerator.WinningNumbersGenerable;
 import org.lotto.domain.numbergenerator.dto.SixRandomNumbersDto;
+import org.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -12,7 +14,7 @@ import org.springframework.http.HttpStatus;
 public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    WinningNumbersGenerable winningNumbersGenerable;
+    NumberGeneratorFacade numberGeneratorFacade;
 
     @Test
     public void should_user_win_and_system_should_generate_winners() {
@@ -35,7 +37,9 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                         .withBody("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]")
                 )
         );
-        final SixRandomNumbersDto sixRandomNumbersDto = winningNumbersGenerable.generateSixWinningNumbers();
+//        final SixRandomNumbersDto sixRandomNumbersDto = winningNumbersGenerable.generateSixWinningNumbers(1, 99, 25);
+        final WinningNumbersDto winningNumbersDto = numberGeneratorFacade.generateWinningNumbers();
+
 
         //when
         //then

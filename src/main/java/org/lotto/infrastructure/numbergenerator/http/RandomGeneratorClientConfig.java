@@ -1,5 +1,6 @@
 package org.lotto.infrastructure.numbergenerator.http;
 
+import org.lotto.domain.numbergenerator.WinningNumberGeneratorFacadeConfigurationProperties;
 import org.lotto.domain.numbergenerator.WinningNumbersGenerable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,19 +19,17 @@ public class RandomGeneratorClientConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateResponseErrorHandler restTemplateResponseErrorHandler) {
+    public RestTemplate restTemplate(RestTemplateResponseErrorHandler restTemplateResponseErrorHandler, WinningNumberGeneratorRestTemplateClientConfigurationProperties properties) {
         return new RestTemplateBuilder()
                 .errorHandler(restTemplateResponseErrorHandler)
-                .setConnectTimeout(Duration.ofMillis(7000))
-                .setReadTimeout(Duration.ofMillis(7000))
+                .setConnectTimeout(Duration.ofMillis(properties.connectionTimeout()))
+                .setReadTimeout(Duration.ofMillis(properties.readTimeout()))
                 .build();
     }
 
     @Bean
-    public WinningNumbersGenerable remoteNumberGeneratorClient(RestTemplate restTemplate,
-                                                               @Value("${lotto.number-generator.http.client.config.uri}") String uri,
-                                                               @Value("${lotto.number-generator.http.client.config.port}") int port) {
-        return new WinningNumbersGenerableRestTemplate(restTemplate, uri, port);
+    public WinningNumbersGenerable remoteNumberGeneratorClient(RestTemplate restTemplate, WinningNumberGeneratorRestTemplateClientConfigurationProperties properties) {
+        return new WinningNumbersGenerableRestTemplate(restTemplate, properties.uri(), properties.port());
     }
 
 }

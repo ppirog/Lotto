@@ -1,7 +1,9 @@
 package org.lotto.domain.numbergenerator;
 
-import java.util.Set;
+import org.springframework.stereotype.Component;
 
+import java.util.Set;
+@Component
 class WinningNumbersValidator {
     private final Integer MIN_NUMBER = 1;
     private final Integer MAX_NUMBER = 99;
