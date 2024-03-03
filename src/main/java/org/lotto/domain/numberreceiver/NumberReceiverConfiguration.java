@@ -20,25 +20,7 @@ public class NumberReceiverConfiguration {
         return new IdGenerator();
     }
 
-    @Bean
-    public TicketRepository ticketRepository() {
-        return new TicketRepository() {
-            @Override
-            public Ticket save(final Ticket ticket) {
-                return null;
-            }
 
-            @Override
-            public List<Ticket> findAll(final LocalDateTime date) {
-                return null;
-            }
-
-            @Override
-            public Optional<Ticket> findById(final String ticketId) {
-                return Optional.empty();
-            }
-        };
-    }
 
 
     @Bean
