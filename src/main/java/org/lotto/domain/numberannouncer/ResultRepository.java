@@ -1,5 +1,6 @@
 package org.lotto.domain.numberannouncer;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ interface ResultRepository {
 
     Optional<Result> deleteByTicketId(String ticketId);
 
-    List<Result> findResultsOlderThanOneMonth();
+    List<Result> findResultsOlderThanOneMonth(LocalDateTime date);
 
     List<Result> findAll();
 }

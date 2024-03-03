@@ -13,12 +13,31 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 class NumberAnnouncerFacadeTest {
 
 
     private final ResultCheckerFacade resultCheckerFacade = mock(ResultCheckerFacade.class);
+
+
+    private final NumberAnnouncerFacade numberAnnouncerFacadeWithInMemoryTestImpl = new NumberAnnouncerFacade(
+            resultCheckerFacade,
+            new InMemoryResultRepositoryTestImpl()
+    );
+    private final InMemoryResultRepositoryTestImpl resultRepository = new InMemoryResultRepositoryTestImpl();
+    private final NumberAnnouncerFacade numberAnnouncerFacadeWithResultRepository = new NumberAnnouncerFacade(
+            resultCheckerFacade,
+            resultRepository
+    );
+    private final LocalDateTime nowForTestImplementation = LocalDateTime.of(2024, 2, 17, 12, 0);
+
+    private final NumberAnnouncerFacade mockedNumberAnnouncerFacade = new TestNumberAnnouncerFacade(
+            resultCheckerFacade,
+            resultRepository,
+            nowForTestImplementation
+    );
 
     @Test
     void should_announce_correct_winner_numbers() {
@@ -28,7 +47,7 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("1")
                         .isWinner(true)
                         .howManyNumbersWin(6)
-                        .winNumbers(Set.of(1,2,3,4,5,6))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5, 6))
                         .drawDate(LocalDateTime.of(2024, 2, 17, 12, 0))
                         .build()
         );
@@ -39,11 +58,12 @@ class NumberAnnouncerFacadeTest {
                 new InMemoryResultRepositoryTestImpl()
         );
 
+
         //when
         ResultDto resultDto = numberAnnouncerFacade.announceResult("1");
 
         //then
-        assertEquals(resultDto.winNumbers(), Set.of(1,2,3,4,5,6));
+        assertEquals(resultDto.winNumbers(), Set.of(1, 2, 3, 4, 5, 6));
     }
 
     @Test
@@ -54,19 +74,16 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("1")
                         .isWinner(true)
                         .howManyNumbersWin(6)
-                        .winNumbers(Set.of(1,2,3,4,5,6))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5, 6))
                         .drawDate(LocalDateTime.of(2024, 2, 17, 12, 0))
                         .build()
         );
 
         //given
-        NumberAnnouncerFacade numberAnnouncerFacade = new NumberAnnouncerFacade(
-                resultCheckerFacade,
-                new InMemoryResultRepositoryTestImpl()
-        );
+
 
         //when
-        ResultDto resultDto = numberAnnouncerFacade.announceResult("1");
+        ResultDto resultDto = numberAnnouncerFacadeWithInMemoryTestImpl.announceResult("1");
 
         //then
         assertEquals(resultDto.ticketId(), "1");
@@ -80,19 +97,14 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("1")
                         .isWinner(true)
                         .howManyNumbersWin(6)
-                        .winNumbers(Set.of(1,2,3,4,5,6))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5, 6))
                         .drawDate(LocalDateTime.of(2024, 2, 17, 12, 0))
                         .build()
         );
 
-        //given
-        NumberAnnouncerFacade numberAnnouncerFacade = new NumberAnnouncerFacade(
-                resultCheckerFacade,
-                new InMemoryResultRepositoryTestImpl()
-        );
 
         //when
-        ResultDto resultDto = numberAnnouncerFacade.announceResult("1");
+        ResultDto resultDto = numberAnnouncerFacadeWithInMemoryTestImpl.announceResult("1");
 
         //then
         assertEquals(resultDto.howManyNumbersWin(), 6);
@@ -106,19 +118,14 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("1")
                         .isWinner(true)
                         .howManyNumbersWin(6)
-                        .winNumbers(Set.of(1,2,3,4,5,6))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5, 6))
                         .drawDate(LocalDateTime.of(2024, 2, 17, 12, 0))
                         .build()
         );
 
-        //given
-        NumberAnnouncerFacade numberAnnouncerFacade = new NumberAnnouncerFacade(
-                resultCheckerFacade,
-                new InMemoryResultRepositoryTestImpl()
-        );
 
         //when
-        ResultDto resultDto = numberAnnouncerFacade.announceResult("1");
+        ResultDto resultDto = numberAnnouncerFacadeWithInMemoryTestImpl.announceResult("1");
 
         //then
         assertTrue(resultDto.isWinner());
@@ -132,7 +139,7 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("1")
                         .isWinner(true)
                         .howManyNumbersWin(6)
-                        .winNumbers(Set.of(1,2,3,4,5,6))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5, 6))
                         .drawDate(LocalDateTime.of(2024, 2, 17, 12, 0))
                         .build()
         );
@@ -142,7 +149,7 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("2")
                         .isWinner(true)
                         .howManyNumbersWin(5)
-                        .winNumbers(Set.of(1,2,3,4,5))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5))
                         .drawDate(LocalDateTime.of(2023, 2, 17, 12, 0))
                         .build()
         );
@@ -152,24 +159,18 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("3")
                         .isWinner(true)
                         .howManyNumbersWin(4)
-                        .winNumbers(Set.of(1,2,3,4))
+                        .winNumbers(Set.of(1, 2, 3, 4))
                         .drawDate(LocalDateTime.of(2022, 2, 17, 12, 0))
                         .build()
         );
 
-        //given
-        final InMemoryResultRepositoryTestImpl resultRepository = new InMemoryResultRepositoryTestImpl();
-        NumberAnnouncerFacade numberAnnouncerFacade = new NumberAnnouncerFacade(
-                resultCheckerFacade,
-                resultRepository
-        );
 
         //when
-        numberAnnouncerFacade.announceResult("1");
-        numberAnnouncerFacade.announceResult("2");
-        numberAnnouncerFacade.announceResult("3");
+        numberAnnouncerFacadeWithResultRepository.announceResult("1");
+        numberAnnouncerFacadeWithResultRepository.announceResult("2");
+        numberAnnouncerFacadeWithResultRepository.announceResult("3");
 
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth();
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth(numberAnnouncerFacadeWithResultRepository.getNow());
 
         final List<Result> all = resultRepository.findAll();
 
@@ -181,12 +182,13 @@ class NumberAnnouncerFacadeTest {
     @Test
     void should_check_if_database_store_only_results_which_are_not_older_than_one_month_test_2() {
 
+
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
                         .ticketId("1")
                         .isWinner(true)
                         .howManyNumbersWin(6)
-                        .winNumbers(Set.of(1,2,3,4,5,6))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5, 6))
                         .drawDate(LocalDateTime.of(2024, 2, 17, 12, 0))
                         .build()
         );
@@ -196,8 +198,8 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("2")
                         .isWinner(true)
                         .howManyNumbersWin(5)
-                        .winNumbers(Set.of(1,2,3,4,5))
-                        .drawDate(LocalDateTime.of(2024, 2, 3, 12, 0))
+                        .winNumbers(Set.of(1, 2, 3, 4, 5))
+                        .drawDate(LocalDateTime.of(2024, 2, 2, 12, 0))
                         .build()
         );
 
@@ -206,24 +208,18 @@ class NumberAnnouncerFacadeTest {
                         .ticketId("3")
                         .isWinner(true)
                         .howManyNumbersWin(4)
-                        .winNumbers(Set.of(1,2,3,4))
+                        .winNumbers(Set.of(1, 2, 3, 4))
                         .drawDate(LocalDateTime.of(2022, 2, 17, 12, 0))
                         .build()
         );
 
-        //given
-        final InMemoryResultRepositoryTestImpl resultRepository = new InMemoryResultRepositoryTestImpl();
-        NumberAnnouncerFacade numberAnnouncerFacade = new NumberAnnouncerFacade(
-                resultCheckerFacade,
-                resultRepository
-        );
 
         //when
-        numberAnnouncerFacade.announceResult("1");
-        numberAnnouncerFacade.announceResult("2");
-        numberAnnouncerFacade.announceResult("3");
+        mockedNumberAnnouncerFacade.announceResult("1");
+        mockedNumberAnnouncerFacade.announceResult("2");
+        mockedNumberAnnouncerFacade.announceResult("3");
 
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth();
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth(mockedNumberAnnouncerFacade.getNow());
 
         final List<Result> all = resultRepository.findAll();
 
