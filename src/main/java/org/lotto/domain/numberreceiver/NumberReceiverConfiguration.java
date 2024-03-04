@@ -4,9 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 @Configuration
 public class NumberReceiverConfiguration {
@@ -19,8 +16,6 @@ public class NumberReceiverConfiguration {
     public IdGenerable idGenerable() {
         return new IdGenerator();
     }
-
-
 
 
     @Bean

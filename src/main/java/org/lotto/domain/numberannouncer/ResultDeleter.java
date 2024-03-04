@@ -11,7 +11,7 @@ class ResultDeleter {
     private final LocalDateTime date;
 
     void cleanUpOldResults() {
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth(date);
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(date);
 
         resultsOlderThanOneMonth
                 .forEach(result -> resultRepository.deleteByTicketId(result.ticketId()));

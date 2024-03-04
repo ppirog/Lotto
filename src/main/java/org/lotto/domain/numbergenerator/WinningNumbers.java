@@ -1,6 +1,8 @@
 package org.lotto.domain.numbergenerator;
 
 import lombok.Builder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 
@@ -8,5 +10,10 @@ import java.time.LocalDateTime;
 
 import java.util.Set;
 @Builder
-record WinningNumbers (Set<Integer> numbers, LocalDateTime date) {
+@Document
+record WinningNumbers (
+        @Id
+        String id,
+        Set<Integer> numbers,
+        LocalDateTime date) {
 }

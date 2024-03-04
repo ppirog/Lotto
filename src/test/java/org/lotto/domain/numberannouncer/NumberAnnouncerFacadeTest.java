@@ -170,7 +170,7 @@ class NumberAnnouncerFacadeTest {
         numberAnnouncerFacadeWithResultRepository.announceResult("2");
         numberAnnouncerFacadeWithResultRepository.announceResult("3");
 
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth(numberAnnouncerFacadeWithResultRepository.getNow());
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(numberAnnouncerFacadeWithResultRepository.getNow());
 
         final List<Result> all = resultRepository.findAll();
 
@@ -219,7 +219,7 @@ class NumberAnnouncerFacadeTest {
         mockedNumberAnnouncerFacade.announceResult("2");
         mockedNumberAnnouncerFacade.announceResult("3");
 
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findResultsOlderThanOneMonth(mockedNumberAnnouncerFacade.getNow());
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(mockedNumberAnnouncerFacade.getNow());
 
         final List<Result> all = resultRepository.findAll();
 

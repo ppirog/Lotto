@@ -38,7 +38,7 @@ class InMemoryResultRepositoryTestImpl implements ResultRepository {
     }
 
     @Override
-    public List<Result> findResultsOlderThanOneMonth(LocalDateTime date) {
+    public List<Result> findByDrawDateBefore(LocalDateTime date) {
         return results.values().stream().filter(result -> result.drawDate().isBefore(date.minusMonths(1))).toList();
 
     }

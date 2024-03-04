@@ -10,7 +10,7 @@ import java.util.Optional;
 interface TicketRepository extends MongoRepository<Ticket, String> {
     Ticket save(Ticket ticket);
 
-    List<Ticket> findAll(LocalDateTime date);
+    List<Ticket> findByDate(LocalDateTime date);
 
     Optional<Ticket> findById(String ticketId);
 }

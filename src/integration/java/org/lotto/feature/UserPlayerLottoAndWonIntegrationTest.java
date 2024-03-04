@@ -40,15 +40,16 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                         .withBody("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]")
                 )
         );
-//        final WinningNumbersDto winningNumbersDto = numberGeneratorFacade.generateWinningNumbers();
+
 
         //step 2
         //given
-        LocalDateTime drawDate = LocalDateTime.of(2022, 11, 19, 12, 0);
+        LocalDateTime drawDate = LocalDateTime.of(2024, 2, 24, 12, 0);
 
         //when
         await()
                 .pollInterval(Duration.ofSeconds(1))
+                .atMost(Duration.ofSeconds(10))
                 .until(() -> {
                             try {
                                 numberGeneratorFacade.retrieveWinningNumbers(drawDate);

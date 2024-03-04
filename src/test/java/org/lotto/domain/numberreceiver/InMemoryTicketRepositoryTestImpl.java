@@ -25,7 +25,7 @@ class InMemoryTicketRepositoryTestImpl implements TicketRepository {
     }
 
     @Override
-    public List<Ticket> findAll(final LocalDateTime date) {
+    public List<Ticket> findByDate(final LocalDateTime date) {
         return inMemoryDatabase
                 .values()
                 .stream()
