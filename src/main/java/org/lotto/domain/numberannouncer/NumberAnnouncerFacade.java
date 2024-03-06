@@ -5,11 +5,17 @@ import org.lotto.domain.numberannouncer.dto.ResultDto;
 import org.lotto.domain.resultchecker.ResultCheckerFacade;
 import org.lotto.domain.resultchecker.dto.PlayerDto;
 
+import java.time.LocalDateTime;
+
 @AllArgsConstructor
 public class NumberAnnouncerFacade {
 
     private final ResultCheckerFacade resultCheckerFacade;
     private final ResultRepository resultRepository;
+
+    public LocalDateTime getNow() {
+        return LocalDateTime.now();
+    }
 
     public ResultDto announceResult(String ticketId) {
 
@@ -18,7 +24,7 @@ public class NumberAnnouncerFacade {
             final Result byTicketId = resultRepository.findByTicketId(ticketId)
                     .orElseThrow(() -> new NotFoundInDatabaseException("Result should exist"));
 
-            cleanUpOldResults();
+            cleanUpOldResults(getNow());
 
             return ResultMapper.mapToPlayerDtoFromResult(byTicketId);
         }
@@ -30,13 +36,13 @@ public class NumberAnnouncerFacade {
 
         resultRepository.save(result);
 
-        cleanUpOldResults();
+        cleanUpOldResults(getNow());
 
         return ResultMapper.mapToPlayerDtoFromResult(result);
     }
 
-    private void cleanUpOldResults() {
-        ResultDeleter resultDeleter = new ResultDeleter(resultRepository);
+    private void cleanUpOldResults(LocalDateTime date) {
+        ResultDeleter resultDeleter = new ResultDeleter(resultRepository,date);
         resultDeleter.cleanUpOldResults();
     }
 }

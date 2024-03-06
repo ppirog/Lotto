@@ -54,7 +54,7 @@ public class NumberReceiverFacade {
 
     public List<TicketDto> userNumbers(LocalDateTime date) {
 
-        final List<Ticket> tickets = repository.findAll(date);
+        final List<Ticket> tickets = repository.findByDate(date);
         return tickets.stream()
                 .map(TicketMapper::mapFromTicketToTicketDto)
                 .toList();

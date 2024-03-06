@@ -16,14 +16,14 @@ import static org.mockito.Mockito.when;
 class NumberGeneratorFacadeTest {
 
 
+
+
     NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
+    NumberGeneratorFacade numberGeneratorFacadeWithRandomNumbers = new NumberGeneratorConfiguration().createForTest(new WinningNumbersGenerator(), new InMemoryWinningNumbersRepositoryTestImpl(), numberReceiverFacade);
+    NumberGeneratorFacade numberGeneratorFacadeWithStaticNumbers = new NumberGeneratorConfiguration().createForTest(new WinningNumbersGeneratorTestImplWithCorrectSetOfNumbers(), new InMemoryWinningNumbersRepositoryTestImpl(), numberReceiverFacade);
 
-    NumberGeneratorFacade numberGeneratorFacadeWithRandomNumbers = new NumberGeneratorFacade(new WinningNumbersGenerator(new OneRandomNumberFetcher()), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
-    NumberGeneratorFacade numberGeneratorFacadeWithStaticNumbers = new NumberGeneratorFacade(new WinningNumbersGeneratorTestImplWithCorrectSetOfNumbers(), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
-
-    NumberGeneratorFacade numberGeneratorFacadeWithStaticIncorrectRangeOfNumbers = new NumberGeneratorFacade(new WinningNumbersGeneratorTestImplWithIncorrectRangeOfNumbersInSetOfNumbers(), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
-    NumberGeneratorFacade numberGeneratorFacadeWithStaticIncorrectSizeSetOfNumbers = new NumberGeneratorFacade(new WinningNumbersGeneratorTestImplWithIncorrectSizeOfSetOfNumbers(), numberReceiverFacade, new InMemoryWinningNumbersRepositoryTestImpl(), new WinningNumbersValidator());
-
+    NumberGeneratorFacade numberGeneratorFacadeWithStaticIncorrectRangeOfNumbers = new NumberGeneratorConfiguration().createForTest(new WinningNumbersGeneratorTestImplWithIncorrectRangeOfNumbersInSetOfNumbers(), new InMemoryWinningNumbersRepositoryTestImpl(), numberReceiverFacade);
+    NumberGeneratorFacade numberGeneratorFacadeWithStaticIncorrectSizeSetOfNumbers = new NumberGeneratorConfiguration().createForTest(new WinningNumbersGeneratorTestImplWithIncorrectSizeOfSetOfNumbers(), new InMemoryWinningNumbersRepositoryTestImpl(), numberReceiverFacade);
     @Test
     void should_return_winning_numbers() {
         when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(LocalDateTime.of(2024, 2, 17, 12, 0));

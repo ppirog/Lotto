@@ -1,11 +1,13 @@
 package org.lotto.domain.numberannouncer;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-interface ResultRepository {
-
-    Result save(Result result);
+@Repository
+interface ResultRepository extends MongoRepository<Result, String> {
 
     Optional<Result> findByTicketId(String ticketId);
 
@@ -13,7 +15,7 @@ interface ResultRepository {
 
     Optional<Result> deleteByTicketId(String ticketId);
 
-    List<Result> findResultsOlderThanOneMonth();
+    List<Result> findByDrawDateBefore(LocalDateTime date);
 
     List<Result> findAll();
 }
