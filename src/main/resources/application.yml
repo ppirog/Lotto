@@ -6,7 +6,7 @@ spring:
 lotto:
   number-generator:
     scheduler:
-      cron: "*/10 * * * * *" # every 10 seconds
+      cron: "0 0 */3 * * *" # every 3 hours
     facade:
       maximalWinningNumber: 99
       minimalWinningNumber: 1
