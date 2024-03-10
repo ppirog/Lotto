@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @AllArgsConstructor
+@Configuration
 public class ResultCheckerConfiguration {
 
     @Bean
