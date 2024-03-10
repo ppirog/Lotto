@@ -2,6 +2,7 @@ package org.lotto.domain.numberannouncer;
 
 import lombok.AllArgsConstructor;
 import org.lotto.domain.numberannouncer.dto.ResultDto;
+import org.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.lotto.domain.resultchecker.ResultCheckerFacade;
 import org.lotto.domain.resultchecker.dto.PlayerDto;
 
@@ -12,10 +13,8 @@ public class NumberAnnouncerFacade {
 
     private final ResultCheckerFacade resultCheckerFacade;
     private final ResultRepository resultRepository;
+    private final NumberReceiverFacade numberReceiverFacade;
 
-    public LocalDateTime getNow() {
-        return LocalDateTime.now();
-    }
 
     public ResultDto announceResult(String ticketId) {
 
@@ -24,7 +23,7 @@ public class NumberAnnouncerFacade {
             final Result byTicketId = resultRepository.findByTicketId(ticketId)
                     .orElseThrow(() -> new NotFoundInDatabaseException("Result should exist"));
 
-            cleanUpOldResults(getNow());
+            cleanUpOldResults(numberReceiverFacade.getNow());
 
             return ResultMapper.mapToPlayerDtoFromResult(byTicketId);
         }
@@ -36,7 +35,7 @@ public class NumberAnnouncerFacade {
 
         resultRepository.save(result);
 
-        cleanUpOldResults(getNow());
+        cleanUpOldResults(numberReceiverFacade.getNow());
 
         return ResultMapper.mapToPlayerDtoFromResult(result);
     }

@@ -73,4 +73,8 @@ public class NumberReceiverFacade {
     public LocalDateTime retrieveNextDrawDate() {
         return DrawDateGenerator.generateDrawDate(LocalDateTime.now(clock));
     }
+
+    public LocalDateTime getNow() {
+        return LocalDateTime.now(clock);
+    }
 }

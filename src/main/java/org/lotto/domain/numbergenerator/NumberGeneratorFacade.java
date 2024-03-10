@@ -3,7 +3,6 @@ package org.lotto.domain.numbergenerator;
 import lombok.AllArgsConstructor;
 import org.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import org.lotto.domain.numberreceiver.NumberReceiverFacade;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.Set;

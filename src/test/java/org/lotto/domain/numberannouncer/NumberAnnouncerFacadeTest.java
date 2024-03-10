@@ -1,8 +1,12 @@
 package org.lotto.domain.numberannouncer;
 
 
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.lotto.domain.numberannouncer.dto.ResultDto;
+import org.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.lotto.domain.resultchecker.ResultCheckerFacade;
 import org.lotto.domain.resultchecker.dto.PlayerDto;
 
@@ -20,27 +24,30 @@ class NumberAnnouncerFacadeTest {
 
 
     private final ResultCheckerFacade resultCheckerFacade = mock(ResultCheckerFacade.class);
-
+    private final NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
     private final NumberAnnouncerFacade numberAnnouncerFacadeWithInMemoryTestImpl = new NumberAnnouncerFacade(
             resultCheckerFacade,
-            new InMemoryResultRepositoryTestImpl()
+            new InMemoryResultRepositoryTestImpl(),
+            numberReceiverFacade
     );
     private final InMemoryResultRepositoryTestImpl resultRepository = new InMemoryResultRepositoryTestImpl();
     private final NumberAnnouncerFacade numberAnnouncerFacadeWithResultRepository = new NumberAnnouncerFacade(
             resultCheckerFacade,
-            resultRepository
+            resultRepository,
+            numberReceiverFacade
     );
     private final LocalDateTime nowForTestImplementation = LocalDateTime.of(2024, 2, 17, 12, 0);
 
-    private final NumberAnnouncerFacade mockedNumberAnnouncerFacade = new TestNumberAnnouncerFacade(
-            resultCheckerFacade,
-            resultRepository,
-            nowForTestImplementation
-    );
+//    private final NumberAnnouncerFacade mockedNumberAnnouncerFacade = new TestNumberAnnouncerFacade(
+//            resultCheckerFacade,
+//            resultRepository,
+//            nowForTestImplementation
+//    );
 
     @Test
     void should_announce_correct_winner_numbers() {
+        when(numberReceiverFacade.getNow()).thenReturn(nowForTestImplementation);
 
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
@@ -55,7 +62,8 @@ class NumberAnnouncerFacadeTest {
         //given
         NumberAnnouncerFacade numberAnnouncerFacade = new NumberAnnouncerFacade(
                 resultCheckerFacade,
-                new InMemoryResultRepositoryTestImpl()
+                new InMemoryResultRepositoryTestImpl(),
+                numberReceiverFacade
         );
 
 
@@ -68,6 +76,7 @@ class NumberAnnouncerFacadeTest {
 
     @Test
     void should_announce_correct_ticket_id() {
+        when(numberReceiverFacade.getNow()).thenReturn(nowForTestImplementation);
 
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
@@ -92,6 +101,8 @@ class NumberAnnouncerFacadeTest {
     @Test
     void should_announce_correct_numbers_of_win() {
 
+        when(numberReceiverFacade.getNow()).thenReturn(nowForTestImplementation);
+
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
                         .ticketId("1")
@@ -112,6 +123,7 @@ class NumberAnnouncerFacadeTest {
 
     @Test
     void should_announce_if_player_is_winner() {
+        when(numberReceiverFacade.getNow()).thenReturn(nowForTestImplementation);
 
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
@@ -133,7 +145,7 @@ class NumberAnnouncerFacadeTest {
 
     @Test
     void should_check_if_database_store_only_results_which_are_not_older_than_one_month_test_1() {
-
+        when(numberReceiverFacade.getNow()).thenReturn(nowForTestImplementation);
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
                         .ticketId("1")
@@ -170,7 +182,7 @@ class NumberAnnouncerFacadeTest {
         numberAnnouncerFacadeWithResultRepository.announceResult("2");
         numberAnnouncerFacadeWithResultRepository.announceResult("3");
 
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(numberAnnouncerFacadeWithResultRepository.getNow());
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(numberReceiverFacade.getNow());
 
         final List<Result> all = resultRepository.findAll();
 
@@ -182,7 +194,7 @@ class NumberAnnouncerFacadeTest {
     @Test
     void should_check_if_database_store_only_results_which_are_not_older_than_one_month_test_2() {
 
-
+        when(numberReceiverFacade.getNow()).thenReturn(nowForTestImplementation);
         when(resultCheckerFacade.findById("1")).thenReturn(
                 PlayerDto.builder()
                         .ticketId("1")
@@ -215,11 +227,11 @@ class NumberAnnouncerFacadeTest {
 
 
         //when
-        mockedNumberAnnouncerFacade.announceResult("1");
-        mockedNumberAnnouncerFacade.announceResult("2");
-        mockedNumberAnnouncerFacade.announceResult("3");
+        numberAnnouncerFacadeWithResultRepository.announceResult("1");
+        numberAnnouncerFacadeWithResultRepository.announceResult("2");
+        numberAnnouncerFacadeWithResultRepository.announceResult("3");
 
-        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(mockedNumberAnnouncerFacade.getNow());
+        final List<Result> resultsOlderThanOneMonth = resultRepository.findByDrawDateBefore(numberReceiverFacade.getNow());
 
         final List<Result> all = resultRepository.findAll();
 

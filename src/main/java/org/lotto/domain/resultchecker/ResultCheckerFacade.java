@@ -21,8 +21,13 @@ public class ResultCheckerFacade {
 
         final TicketDto ticketDto = numberReceiverFacade.usersNumberByTicketId(ticketId);
 
+        if (numberReceiverFacade.getNow().isBefore(ticketDto.drawDate().plusMinutes(5))) {
+            throw new DrawDateIsAfterNowException("Draw date is after now");
+        }
+
         final WinningNumbersDto winningNumbersDto = numberGeneratorFacade.retrieveWinningNumbers(ticketDto.drawDate());
 
         return PlayerMapper.mapFromTicketDtoAndWinningNumbersDtoToPlayerDto(ticketDto, winningNumbersDto, new TicketValidator());
     }
+
 }
