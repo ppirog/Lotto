@@ -1,6 +1,7 @@
 package org.lotto.infrastructure.numbergenerator.http;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import org.lotto.domain.numbergenerator.WinningNumberGeneratorFacadeConfigurationProperties;
 import org.lotto.domain.numbergenerator.WinningNumbersGenerable;
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 
 @AllArgsConstructor
+@Log4j2
 public class WinningNumbersGenerableRestTemplate implements WinningNumbersGenerable {
 
 
@@ -48,7 +50,8 @@ public class WinningNumbersGenerableRestTemplate implements WinningNumbersGenera
                 new ParameterizedTypeReference<>() {
                 }
         );
-        System.out.println(exchange.getBody());
+
+        log.info(exchange.getBody());
 
         return new SixRandomNumbersDto(new HashSet<>(Objects.requireNonNull(exchange.getBody())));
     }

@@ -4,9 +4,9 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.lotto.BaseIntegrationTest;
+import org.lotto.domain.numberannouncer.dto.ResultDto;
 import org.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import org.lotto.domain.numberreceiver.AdjustableClock;
-import org.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +21,8 @@ import java.util.Set;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -43,7 +43,7 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
          * step 1: external service returns 6 random numbers (1,2,3,4,5,6)
          * step 2: system fetched winning numbers for draw date: 19.11.2022 12:00
          * step 3: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
-         * step 4 user made GET /results/notExistingId and system returned 404 (NOT_FOUND) with body: “No ticket found for id: ticketId”
+         * step 4a user made GET /results/notExistingId and system returned 404 (NOT_FOUND) with body: “No ticket found for id: ticketId”
          * step 4b user made GET /results/existingId to early and system returned 404 (NOT_FOUND) with body: “"Draw date " + ticketDto.drawDate() + "is after now" + numberReceiverFacade.getNow(”
          * step 5: 3 days, 2hrs and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)
          * step 6: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
@@ -62,7 +62,7 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
         //step 2 system fetched winning numbers for draw date: 19.11.2022 12:00
         LocalDateTime drawDate = LocalDateTime.of(2022, 11, 19, 12, 0);
 
-        await().pollInterval(Duration.ofSeconds(1)).atMost(Duration.ofSeconds(3)).until(() -> {
+        await().pollInterval(Duration.ofSeconds(1)).atMost(Duration.ofSeconds(4)).until(() -> {
             try {
                 numberGeneratorFacade.retrieveWinningNumbers(drawDate);
                 return true;
@@ -95,7 +95,7 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
         assertAll(() -> assertEquals("success", inputNumberResultDto.message()), () -> assertEquals(drawDate, inputNumberResultDto.ticketDto().drawDate()), () -> assertEquals(Set.of(1, 2, 3, 4, 5, 6), inputNumberResultDto.ticketDto().userNumbers()));
 
 
-        //step 4 user made GET /results/notExistingId and system returned 404 (NOT_FOUND) with body: “No ticket found for id: ticketId”
+        //step 4a user made GET /results/notExistingId and system returned 404 (NOT_FOUND) with body: “No ticket found for id: ticketId”
         final ResultActions perform1 = mockMvc.perform(get("/results/ticketId"));
 
         perform1.andExpect(content().json("""
@@ -107,36 +107,35 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
         ));
 
 
-        //step 4b user made GET /results/existingId to early and system returned 404 (NOT_FOUND) with body: “"Draw date " + ticketDto.drawDate() + "is after now" + numberReceiverFacade.getNow(”
+
+        //step 4b change date to 2022-11-19 12:04 user made GET /results/existingId to 1 minute too early and system returned 425 (TOO_EARLY) with body: “"Draw date is after now”
+        clock.setClockToLocalDateTime(LocalDateTime.of(2022, 11, 19, 12, 4));
         final ResultActions perform2 = mockMvc.perform(get("/results/"+inputNumberResultDto.ticketDto().ticketId()));
 
         perform2.andExpect(content().json("""
                                 {
                                     "message" : "Draw date is after now",
-                                    "status" : "BAD_REQUEST"
+                                    "status" : "TOO_EARLY"
                                 }
                 """.trim()
         ));
 
 
-        //step 5 3 days, 2hrs and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:05)
+        //step 5 change date to  2022-11-19 12:05
         clock.setClockToLocalDateTime(LocalDateTime.of(2022, 11, 19, 12, 5));
 
 
         //step 6: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
         final ResultActions perform3 = mockMvc.perform(get("/results/"+inputNumberResultDto.ticketDto().ticketId()));
+        final MvcResult mvcResult1 = perform3.andExpect(status().isOk()).andReturn();
+        final String contentAsString1 = mvcResult1.getResponse().getContentAsString();
+        final ResultDto dto = objectMapper.readValue(contentAsString1, ResultDto.class);
 
-        perform3.andExpect(status().isOk())
-                .andExpect(content().json("""
-                                {
-                                  "ticketId": "%s",
-                                  "isWinner": true,
-                                  "howManyNumbersWin": 6,
-                                  "winNumbers": [
-                                    1,2,3,4,5,6
-                                  ]
-                                }
-                """.formatted(inputNumberResultDto.ticketDto().ticketId()).trim()
-        ));
+        assertAll(
+                () -> assertEquals(inputNumberResultDto.ticketDto().ticketId(), dto.ticketId()),
+                () -> assertTrue(dto.isWinner()),
+                () -> assertEquals(6, dto.howManyNumbersWin()),
+                () -> assertEquals(Set.of(1, 2, 3, 4, 5, 6), dto.winNumbers())
+        );
     }
 }

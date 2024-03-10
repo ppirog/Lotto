@@ -16,12 +16,13 @@ public class ResultCheckerFacade {
 
     private final NumberReceiverFacade numberReceiverFacade;
     private final NumberGeneratorFacade numberGeneratorFacade;
+    private final ResultCheckerConfigurationProperties properties;
 
     public PlayerDto findById(String ticketId) {
 
         final TicketDto ticketDto = numberReceiverFacade.usersNumberByTicketId(ticketId);
 
-        if (numberReceiverFacade.getNow().isBefore(ticketDto.drawDate().plusMinutes(5))) {
+        if (numberReceiverFacade.getCurrentLocalDateTime().isBefore(ticketDto.drawDate().plusMinutes(properties.minutesToWaitForResults()))) {
             throw new DrawDateIsAfterNowException("Draw date is after now");
         }
 

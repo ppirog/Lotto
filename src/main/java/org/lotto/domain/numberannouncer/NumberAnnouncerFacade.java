@@ -23,7 +23,7 @@ public class NumberAnnouncerFacade {
             final Result byTicketId = resultRepository.findByTicketId(ticketId)
                     .orElseThrow(() -> new NotFoundInDatabaseException("Result should exist"));
 
-            cleanUpOldResults(numberReceiverFacade.getNow());
+            cleanUpOldResults(numberReceiverFacade.getCurrentLocalDateTime());
 
             return ResultMapper.mapToPlayerDtoFromResult(byTicketId);
         }
@@ -35,7 +35,7 @@ public class NumberAnnouncerFacade {
 
         resultRepository.save(result);
 
-        cleanUpOldResults(numberReceiverFacade.getNow());
+        cleanUpOldResults(numberReceiverFacade.getCurrentLocalDateTime());
 
         return ResultMapper.mapToPlayerDtoFromResult(result);
     }

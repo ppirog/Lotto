@@ -7,11 +7,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @AllArgsConstructor
-@Configuration
-class ResultCheckerConfiguration {
+public class ResultCheckerConfiguration {
 
     @Bean
-    public ResultCheckerFacade resultCheckerFacade(NumberReceiverFacade numberReceiverFacade, NumberGeneratorFacade numberGeneratorFacade) {
-        return new ResultCheckerFacade(numberReceiverFacade, numberGeneratorFacade);
+    public ResultCheckerFacade resultCheckerFacade(NumberReceiverFacade numberReceiverFacade, NumberGeneratorFacade numberGeneratorFacade,ResultCheckerConfigurationProperties properties) {
+        return new ResultCheckerFacade(numberReceiverFacade, numberGeneratorFacade,properties);
+    }
+
+    public ResultCheckerFacade createForTest(NumberReceiverFacade numberReceiverFacade, NumberGeneratorFacade numberGeneratorFacade) {
+        final ResultCheckerConfigurationProperties properties = ResultCheckerConfigurationProperties
+                .builder()
+                .minutesToWaitForResults(5)
+                .build();
+
+        return resultCheckerFacade(numberReceiverFacade, numberGeneratorFacade, properties);
     }
 }

@@ -15,9 +15,9 @@ class NumberCheckerErrorHandler {
 
     @ExceptionHandler(DrawDateIsAfterNowException.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.TOO_EARLY)
     public NotFoundTicketResponseDto handleException(DrawDateIsAfterNowException exception) {
         log.warn("DrawDateIsAfterNowException - error while accesing ticket by id");
-        return new NotFoundTicketResponseDto(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new NotFoundTicketResponseDto(exception.getMessage(), HttpStatus.TOO_EARLY);
     }
 }

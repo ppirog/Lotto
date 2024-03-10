@@ -4,6 +4,9 @@ spring:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
 
 lotto:
+  result-checker:
+    facade:
+      minutesToWaitForResults: 5
   number-generator:
     scheduler:
       cron: "0 0 12 * * SAT" # every Saturday at 12:00
