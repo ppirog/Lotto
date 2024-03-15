@@ -2,17 +2,17 @@ package org.lotto.infrastructure.numbergenerator.http;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.lotto.domain.numbergenerator.NumberGeneratorFacade;
-import org.lotto.domain.numbergenerator.WinningNumberGeneratorFacadeConfigurationProperties;
 import org.lotto.domain.numbergenerator.WinningNumbersGenerable;
 import org.lotto.domain.numbergenerator.dto.SixRandomNumbersDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.HashSet;
@@ -42,21 +42,23 @@ public class WinningNumbersGenerableRestTemplate implements WinningNumbersGenera
                 .queryParam("count", count)
                 .toUriString();
 
-
-        final ResponseEntity<List<Integer>> exchange = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                requestEntity,
-                new ParameterizedTypeReference<>() {
-                }
-        );
-
-        log.info(exchange.getBody());
-
-        return new SixRandomNumbersDto(new HashSet<>(Objects.requireNonNull(exchange.getBody())));
+        try {
+            final ResponseEntity<List<Integer>> exchange = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    requestEntity,
+                    new ParameterizedTypeReference<>() {
+                    }
+            );
+            log.info(exchange.getBody());
+            return new SixRandomNumbersDto(new HashSet<>(Objects.requireNonNull(exchange.getBody())));
+        } catch (ResourceAccessException e) {
+            log.error("Error While fetching data" + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private String getUrlForService(String service) {
-        return uri+ ":" + port + service;
+        return uri + ":" + port + service;
     }
 }
