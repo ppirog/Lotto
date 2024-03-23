@@ -7,13 +7,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
 @Configuration
 @Profile("integration")
-class IntegrationConfiguration {
+class AdjustableClockTestConfig {
 
     @Bean
     @Primary
@@ -24,4 +23,7 @@ class IntegrationConfiguration {
                 ZoneId.systemDefault()
         );
     }
+
+
+
 }

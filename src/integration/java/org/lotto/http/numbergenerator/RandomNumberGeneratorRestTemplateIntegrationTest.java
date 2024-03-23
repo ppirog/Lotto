@@ -5,12 +5,13 @@ import com.github.tomakehurst.wiremock.http.Fault;
 import org.junit.jupiter.api.Test;
 import org.lotto.domain.numbergenerator.WinningNumbersGenerable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertAll;
-
+@WithMockUser
 class RandomNumberGeneratorRestTemplateIntegrationTest extends RandomNumberGeneratorRestTemplateIntegrationTestConfig {
     WinningNumbersGenerable winningNumbersGenerable = remoteNumberGeneratorClient(restTemplateResponseErrorHandler());
     private final String CONTENT_TYPE = "Content-Type";
