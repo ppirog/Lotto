@@ -24,6 +24,7 @@
         <mockito-core.version>4.9.0</mockito-core.version>
         <wiremock-jre8-standalone.version>2.35.0</wiremock-jre8-standalone.version>
         <awaitility.version>4.2.0</awaitility.version>
+        <java-jwt.version>4.4.0</java-jwt.version>
     </properties>
 
     <dependencies>
@@ -51,6 +52,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+<!--        spring boot end-->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -126,6 +137,12 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.1.0</version>
+        </dependency>
+<!--        JWT-->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java-jwt.version}</version>
         </dependency>
     </dependencies>
     <build>

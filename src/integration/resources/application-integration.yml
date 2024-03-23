@@ -14,3 +14,7 @@ lotto:
           port: 80
     scheduler:
       cron: "*/1 * * * * *" # every 1 second
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET}

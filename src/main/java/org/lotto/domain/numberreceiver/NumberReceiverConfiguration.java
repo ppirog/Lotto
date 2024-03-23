@@ -6,14 +6,14 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Clock;
 
 @Configuration
-public class NumberReceiverConfiguration {
+class NumberReceiverConfiguration {
     @Bean
     public Clock clock() {
-        return Clock.systemDefaultZone();
+        return Clock.systemUTC();
     }
 
     @Bean
-    public IdGenerable idGenerable() {
+    IdGenerable idGenerable() {
         return new IdGenerator();
     }
 
