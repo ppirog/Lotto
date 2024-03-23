@@ -11,8 +11,13 @@ import org.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -36,6 +41,15 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private AdjustableClock clock;
+    @Container
+    public static final MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
+
+    @DynamicPropertySource
+    public static void setProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
+        registry.add("lotto.number-generator.http.client.config.uri", () -> WIRE_MOCK_HOST);
+        registry.add("lotto.number-generator.http.client.config.port", wireMockServer::getPort);
+    }
 
     @Test
     public void should_user_win_and_system_should_generate_winners() throws Exception {
