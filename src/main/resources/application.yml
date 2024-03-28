@@ -10,7 +10,7 @@ spring:
   cache:
     type: redis
     redis:
-      time-to-live: PT60S
+      time-to-live: PT1H
 lotto:
   result-checker:
     facade:
