@@ -4,7 +4,13 @@ spring:
   data:
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
-
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  cache:
+    type: redis
+    redis:
+      time-to-live: PT1S
 lotto:
   number-generator:
     http:

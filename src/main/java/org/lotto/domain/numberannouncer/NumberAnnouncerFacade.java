@@ -5,6 +5,7 @@ import org.lotto.domain.numberannouncer.dto.ResultDto;
 import org.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.lotto.domain.resultchecker.ResultCheckerFacade;
 import org.lotto.domain.resultchecker.dto.PlayerDto;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +16,7 @@ public class NumberAnnouncerFacade {
     private final ResultRepository resultRepository;
     private final NumberReceiverFacade numberReceiverFacade;
 
-
+    @Cacheable("announceResult")
     public ResultDto announceResult(String ticketId) {
 
         if (resultRepository.existsByTicketId(ticketId)) {
