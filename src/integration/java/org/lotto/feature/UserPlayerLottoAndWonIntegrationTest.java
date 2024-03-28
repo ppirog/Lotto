@@ -4,18 +4,22 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.lotto.BaseIntegrationTest;
+import org.lotto.domain.numberannouncer.NumberAnnouncerFacade;
 import org.lotto.domain.numberannouncer.dto.ResultDto;
 import org.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import org.lotto.domain.numberreceiver.AdjustableClock;
 import org.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import org.lotto.infrastructure.token.controller.JwtResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
@@ -30,6 +34,8 @@ import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -38,27 +44,45 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Log4j2
 public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private NumberGeneratorFacade numberGeneratorFacade;
-
-    @Autowired
-    private AdjustableClock clock;
     @Container
     public static final MongoDBContainer mongoDBContainer = new MongoDBContainer(DockerImageName.parse("mongo:4.0.10"));
+    public static final String FULL_IMAGE_NAME = "redis";
+    public static final String REDIS_TIME_TO_LIVE = "PT1S";
+    @Container
+    private static final GenericContainer<?> REDIS;
 
+    static {
+
+        REDIS = new GenericContainer<>(FULL_IMAGE_NAME)
+                .withExposedPorts(6379);
+        REDIS.start();
+    }
+
+    @Autowired
+    CacheManager cacheManager;
+    @SpyBean
+    NumberAnnouncerFacade numberAnnouncerFacadeSpyBean;
+    @Autowired
+    private NumberGeneratorFacade numberGeneratorFacade;
+    @Autowired
+    private AdjustableClock clock;
 
     @DynamicPropertySource
     public static void setProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
         registry.add("lotto.number-generator.http.client.config.uri", () -> WIRE_MOCK_HOST);
         registry.add("lotto.number-generator.http.client.config.port", wireMockServer::getPort);
+
+        registry.add("spring.cache.redis.time-to-live", () -> REDIS_TIME_TO_LIVE);
+        registry.add("spring.data.redis.port", () -> REDIS.getFirstMappedPort().toString());
+        registry.add("spring.cache.redis", () -> FULL_IMAGE_NAME);
     }
 
     @Test
     public void should_user_win_and_system_should_generate_winners() throws Exception {
         /*
          * step 1 external service returns 6 random numbers (1,2,3,4,5,6)
-         * step 2 system fetched winning numbers for draw date: 19.11.2022 12:00
+         * step 2 system fetched winning numbers for draw date: 19.11.2022 12:00 (scheduler test)
          * step 3 user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned UNAUTHORIZED(401)
          * step 4 user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned UNAUTHORIZED(401)
          * step 5 user made POST /register with username=someUser, password=somePassword  and system registered user with status CREATED(201)
@@ -69,7 +93,9 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
          * step 10 change date to 2022-11-19 12:04 user made GET /results/existingId with header “Authorization: Bearer AAAA.BBBB.CCC”  to 1 minute too early and system returned 425 (TOO_EARLY) with body: “"Draw date is after now”
          * step 11 change date to  2022-11-19 12:05
          * step 12 system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
+         * step 13 should get/results/" + ticketId response be cached by 1 second (redis test)
          * */
+
 
 
         //step 1 external service returns 6 random numbers (1,2,3,4,5,6)
@@ -79,10 +105,14 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                         .withBody("[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]")));
 
 
-        //step 2 system fetched winning numbers for draw date: 19.11.2022 12:00
+
+        //step 2 system fetched winning numbers for draw date: 19.11.2022 12:00 (scheduler test)
         LocalDateTime drawDate = LocalDateTime.of(2022, 11, 19, 12, 0);
 
-        await().pollInterval(Duration.ofSeconds(1)).atMost(Duration.ofSeconds(4)).until(() -> {
+        await().pollInterval(
+                Duration.ofSeconds(1)).
+                atMost(Duration.ofSeconds(4))
+                .until(() -> {
             try {
                 numberGeneratorFacade.retrieveWinningNumbers(drawDate);
                 return true;
@@ -90,6 +120,7 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 return false;
             }
         });
+
 
 
         //step 3 user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned UNAUTHORIZED(401)
@@ -105,38 +136,41 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized());
 
 
+
         //step 4 user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned UNAUTHORIZED(401)
         mockMvc.perform(post("/inputNumbers").contentType(MediaType.APPLICATION_JSON).content("""
-                {
-                    "numbers":[
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6
-                    ]
-                }
-                """))
+                        {
+                            "numbers":[
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6
+                            ]
+                        }
+                        """))
                 .andExpect(status().isUnauthorized());
+
 
 
         //step 5 user made POST /register with username=someUser, password=somePassword  and system registered user with status CREATED(201)
         mockMvc.perform(post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                {
-                "username": "someUser",
-                "password": "somePassword"
-                }
-                """))
+                                {
+                                "username": "someUser",
+                                "password": "somePassword"
+                                }
+                                """))
                 .andExpect(status().isCreated())
                 .andExpect(content().json("""
-                {
-                "message": "User registered",
-                "status": "CREATED"
-                }
-                """));
+                        {
+                        "message": "User registered",
+                        "status": "CREATED"
+                        }
+                        """));
+
 
 
         //step 6: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned OK(200) and jwttoken=AAAA.BBBB.CCC
@@ -154,45 +188,47 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
         String token = jwtResponseDto.token();
 
         assertAll(
-                () -> assertEquals(jwtResponseDto.username(),"someUser"),
+                () -> assertEquals(jwtResponseDto.username(), "someUser"),
                 () -> assertThat(token).matches(Pattern.compile("^[A-Za-z0-9-_=]+\\.[A-Za-z0-9-_=]+\\.?[A-Za-z0-9-_.+/=]*$"))
         );
 
 
+
         //step 7 user made POST /inputNumbers without any header with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned UNAUTORIZED(401)
         mockMvc.perform(post("/inputNumbers")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                {
-                    "numbers":[
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6
-                    ]
-                }
-                """))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "numbers":[
+                                        1,
+                                        2,
+                                        3,
+                                        4,
+                                        5,
+                                        6
+                                    ]
+                                }
+                                """))
                 .andExpect(status().isUnauthorized());
+
 
 
         //step 8  user made POST /inputNumbers with header “Authorization: Bearer AAAA.BBBB.CCC” with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
         final ResultActions perform = mockMvc.perform(post("/inputNumbers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization","Bearer " + token)
+                .header("Authorization", "Bearer " + token)
                 .content("""
-                {
-                    "numbers":[
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6
-                    ]
-                }
-                """));
+                        {
+                            "numbers":[
+                                1,
+                                2,
+                                3,
+                                4,
+                                5,
+                                6
+                            ]
+                        }
+                        """));
 
         final MvcResult mvcResult = perform.andExpect(status().isOk()).andReturn();
 
@@ -203,9 +239,10 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
         assertAll(() -> assertEquals("success", inputNumberResultDto.message()), () -> assertEquals(drawDate, inputNumberResultDto.ticketDto().drawDate()), () -> assertEquals(Set.of(1, 2, 3, 4, 5, 6), inputNumberResultDto.ticketDto().userNumbers()));
 
 
+
         //step 9 user made GET /results/notExistingId with header “Authorization: Bearer AAAA.BBBB.CCC”  and system returned 404 (NOT_FOUND) with body: “No ticket found for id: ticketId”
         final ResultActions perform1 = mockMvc.perform(get("/results/ticketId")
-                .header("Authorization","Bearer " + token)
+                .header("Authorization", "Bearer " + token)
         );
 
         perform1.andExpect(content().json("""
@@ -220,8 +257,8 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
         //step 10 change date to 2022-11-19 12:04 user made GET /results/existingId with header “Authorization: Bearer AAAA.BBBB.CCC”  to 1 minute too early and system returned 425 (TOO_EARLY) with body: “"Draw date is after now”
         clock.setClockToLocalDateTime(LocalDateTime.of(2022, 11, 19, 12, 4));
-        final ResultActions perform2 = mockMvc.perform(get("/results/"+inputNumberResultDto.ticketDto().ticketId())
-                .header("Authorization","Bearer " + token));
+        final ResultActions perform2 = mockMvc.perform(get("/results/" + inputNumberResultDto.ticketDto().ticketId())
+                .header("Authorization", "Bearer " + token));
 
         perform2.andExpect(content().json("""
                                 {
@@ -232,13 +269,16 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
         ));
 
 
+
         //step 11 change date to  2022-11-19 12:05
         clock.setClockToLocalDateTime(LocalDateTime.of(2022, 11, 19, 12, 5));
 
 
+
         //step 12 system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
-        final ResultActions perform3 = mockMvc.perform(get("/results/"+inputNumberResultDto.ticketDto().ticketId())
-                .header("Authorization","Bearer " + token));
+        final String ticketId = inputNumberResultDto.ticketDto().ticketId();
+        final ResultActions perform3 = mockMvc.perform(get("/results/" + ticketId)
+                .header("Authorization", "Bearer " + token));
         final MvcResult mvcResult1 = perform3.andExpect(status().isOk()).andReturn();
         final String contentAsString1 = mvcResult1.getResponse().getContentAsString();
         final ResultDto dto = objectMapper.readValue(contentAsString1, ResultDto.class);
@@ -249,5 +289,26 @@ public class UserPlayerLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 () -> assertEquals(6, dto.howManyNumbersWin()),
                 () -> assertEquals(Set.of(1, 2, 3, 4, 5, 6), dto.winNumbers())
         );
+
+
+
+        //step 13 should get/results/" + ticketId response be cached by 1 second (redis test)
+        final int seconds1 = 6;
+        final int millis1 = 100;
+        await()
+                .atMost(Duration.ofSeconds(seconds1))
+                .pollInterval(Duration.ofMillis(millis1))
+                .untilAsserted(() -> {
+
+                    mockMvc.perform(get("/results/" + ticketId)
+                            .header("Authorization", "Bearer " + token));
+
+                    // in step 12 numberAnnouncerFacade was used 1 time. (in times() needs to be expectedNumber plus 1)
+                    verify(numberAnnouncerFacadeSpyBean, times(1 + seconds1)).announceResult(ticketId);
+                });
+
+        assertThat(cacheManager.getCacheNames().contains("announceResult")).isTrue();
+
+
     }
 }
