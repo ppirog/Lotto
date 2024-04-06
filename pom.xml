@@ -23,6 +23,7 @@
         <assertj-core.version>3.21.0</assertj-core.version>
         <mockito-core.version>4.9.0</mockito-core.version>
         <wiremock-jre8-standalone.version>2.35.0</wiremock-jre8-standalone.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
         <awaitility.version>4.2.0</awaitility.version>
         <java-jwt.version>4.4.0</java-jwt.version>
         <spring-data-redis.version>2.4.5</spring-data-redis.version>
@@ -134,12 +135,15 @@
             <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
+
+
 <!--      SWAGGER  -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
         </dependency>
+
 <!--        JWT-->
         <dependency>
             <groupId>com.auth0</groupId>
