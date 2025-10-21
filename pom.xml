@@ -22,7 +22,7 @@
         <junit-jupiter-api.version>5.9.1</junit-jupiter-api.version>
         <assertj-core.version>3.21.0</assertj-core.version>
         <mockito-core.version>4.9.0</mockito-core.version>
-        <wiremock-jre8-standalone.version>2.35.0</wiremock-jre8-standalone.version>
+        <wiremock-jre8-standalone.version>2.35.1</wiremock-jre8-standalone.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
         <awaitility.version>4.2.0</awaitility.version>
         <java-jwt.version>4.4.0</java-jwt.version>
